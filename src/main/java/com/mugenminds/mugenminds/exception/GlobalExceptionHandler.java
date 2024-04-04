@@ -30,11 +30,18 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-
     public ResponseEntity<?> handleValidationExceptions(MethodArgumentNotValidException ex) {
 
         ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), "Validation Error", ex.getBindingResult().toString());
 
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<?> handleResourceNotFoundExceptions(ResourceNotFoundException ex, WebRequest request){
+
+        ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), "Resource Not found", request.getDescription(false));
+
+        return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
     }
 }

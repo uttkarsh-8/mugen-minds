@@ -11,8 +11,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LoginDto {
-    @NotBlank(message = "Please enter a username or an email")
+    @NotBlank(message = "In 'usernameOrEmail' Please enter a username or an email")
     private String usernameOrEmail;
-    @NotBlank(message = "Please enter a password")
+    @NotBlank(message = "In 'password' Please enter a password")
     private String password;
 }

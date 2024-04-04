@@ -22,6 +22,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<JwtAuthResponse> login(@RequestBody LoginDto loginDto){
+
         String token = authService.Login(loginDto);
 
         JwtAuthResponse jwtAuthResponse = new JwtAuthResponse();
