@@ -4,6 +4,7 @@ import com.mugenminds.mugenminds.payload.JwtAuthResponse;
 import com.mugenminds.mugenminds.payload.LoginDto;
 import com.mugenminds.mugenminds.payload.RegisterDto;
 import com.mugenminds.mugenminds.service.AuthService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +22,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<JwtAuthResponse> login(@RequestBody LoginDto loginDto){
+    public ResponseEntity<JwtAuthResponse> login(@Valid @RequestBody LoginDto loginDto){
 
         String token = authService.Login(loginDto);
 
@@ -32,7 +33,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody RegisterDto registerDto){
+    public ResponseEntity<String> register(@Valid @RequestBody RegisterDto registerDto){
         String register = authService.Register(registerDto);
 
         return new ResponseEntity<>(register, HttpStatus.CREATED);
