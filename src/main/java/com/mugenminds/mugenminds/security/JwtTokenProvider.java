@@ -1,20 +1,15 @@
 package com.mugenminds.mugenminds.security;
 
 import com.mugenminds.mugenminds.exception.InvalidJwtAuthenticationException;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Date;
-
-
+import org.springframework.security.core.GrantedAuthority;
 
 @Component
 public class JwtTokenProvider {
@@ -24,6 +19,7 @@ public class JwtTokenProvider {
     @Value("${app-jwt-expiration-milliseconds}")
     private long jwtExpirationDate;
 
+    // Corrected generateToken method
     public String generateToken(Authentication authentication){
 
         String username = authentication.getName();
@@ -31,37 +27,55 @@ public class JwtTokenProvider {
         Date currentDate = new Date();
         Date expiry = new Date(currentDate.getTime()+jwtExpirationDate);
 
+        String role = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .findFirst() // Since we're assuming only one role per user
+                .orElseThrow(() -> new IllegalStateException("User has no roles"));
+
         String token = Jwts.builder()
-                .subject(username)
-                .issuedAt(new Date())
-                .expiration(expiry)
+                .setSubject(username)
+                .claim("role",role)
+                .setIssuedAt(new Date())
+                .setExpiration(expiry)
                 .signWith(key())
                 .compact();
 
         return token;
     }
 
+    // Corrected getUsername method
+    public String getUsername(String token){
+
+        return Jwts.parser()
+                .setSigningKey(key())
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+    }
+
+    public String getRoleFromToken(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.get("role", String.class);
+    }
+
+
     private Key key(){
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
 
-    public String getUsername(String token){
 
-        return Jwts.parser()
-                .verifyWith((SecretKey) key())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .getSubject();
-    }
-
+    // Corrected validateToken method
     public boolean validateToken(String token){
 
         try {
             Jwts.parser()
-                    .verifyWith((SecretKey) key())
-                    .build()
-                    .parse(token);
+                    .setSigningKey(key())
+                    .parseClaimsJws(token);
 
             return true;
         }catch (MalformedJwtException malformedJwtException){
