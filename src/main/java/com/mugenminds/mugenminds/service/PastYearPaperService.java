@@ -9,6 +9,6 @@ public interface PastYearPaperService {
     PastYearPaperDTO updatePastYearPaper(Long paperId, PastYearPaperDTO pastYearPaperDTO);
     PastYearPaperDTO findPastYearPaperById(Long paperId);
     List<PastYearPaperDTO> findAllPapersBySubjectId(Long subjectId);
-    void deletePastYearPaperById(Long paperId);
+    String deletePastYearPaperById(Long paperId);
     List<PastYearPaperDTO> findAllPapers();
 }

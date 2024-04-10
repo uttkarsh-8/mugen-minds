@@ -22,7 +22,6 @@ public class NoteServiceImpl implements NoteService {
     private final SubjectRepository subjectRepository; // Add SubjectRepository
     private final ModelMapper modelMapper;
 
-    @Autowired
     public NoteServiceImpl(NoteRepository noteRepository, SubjectRepository subjectRepository, ModelMapper modelMapper) {
         this.noteRepository = noteRepository;
         this.subjectRepository = subjectRepository; // Initialize SubjectRepository
