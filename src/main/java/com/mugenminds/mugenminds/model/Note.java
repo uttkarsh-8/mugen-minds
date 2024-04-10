@@ -16,7 +16,7 @@ public class Note {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String title;
-    private String googleDroveLink;
+    private String googleDriveLink;
 
     @ManyToOne
     @JoinColumn(name = "subject_id", nullable = false)

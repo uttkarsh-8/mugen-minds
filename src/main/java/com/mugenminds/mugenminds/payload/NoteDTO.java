@@ -1,5 +1,6 @@
 package com.mugenminds.mugenminds.payload;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,9 +12,11 @@ import lombok.Setter;
 @AllArgsConstructor
 public class NoteDTO {
     private long id;
-    private long subjectId;
+    @NotBlank(message = "cannot be empty!!")
+    private Long subjectId;
+    @NotBlank(message = "cannot be empty!!")
     private String title;
-    private String content;
+    @NotBlank(message = "cannot be empty!!")
     private String googleDriveLink;
 
 }
