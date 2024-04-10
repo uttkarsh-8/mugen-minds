@@ -1,8 +1,10 @@
 package com.mugenminds.mugenminds.service.impl;
 
 import com.mugenminds.mugenminds.model.Quiz;
+import com.mugenminds.mugenminds.model.Subject;
 import com.mugenminds.mugenminds.payload.QuizDTO;
 import com.mugenminds.mugenminds.repository.QuizRepository;
+import com.mugenminds.mugenminds.repository.SubjectRepository;
 import com.mugenminds.mugenminds.service.QuizService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -18,16 +20,22 @@ public class QuizServiceImpl implements QuizService {
 
     private final QuizRepository quizRepository;
     private final ModelMapper modelMapper;
+    private final SubjectRepository subjectRepository;
 
-    public QuizServiceImpl(QuizRepository quizRepository, ModelMapper modelMapper) {
+    public QuizServiceImpl(QuizRepository quizRepository, ModelMapper modelMapper, SubjectRepository subjectRepository) {
         this.quizRepository = quizRepository;
         this.modelMapper = modelMapper;
+        this.subjectRepository = subjectRepository;
     }
 
     @Override
     @Transactional
     public QuizDTO createQuiz(QuizDTO quizDTO) {
         Quiz quiz = modelMapper.map(quizDTO, Quiz.class);
+        Subject subject = subjectRepository.findById(quizDTO.getSubjectId())
+                .orElseThrow(() -> new EntityNotFoundException("Subject not found with id: " + quizDTO.getSubjectId()));
+        quiz.setSubject(subject);
+
         Quiz savedQuiz = quizRepository.save(quiz);
 
         return modelMapper.map(savedQuiz, QuizDTO.class);
@@ -38,11 +46,20 @@ public class QuizServiceImpl implements QuizService {
     public QuizDTO updateQuiz(long quizId, QuizDTO quizDTO) {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new EntityNotFoundException("Quiz not found with id: " + quizId));
+
+        if (quizDTO.getSubjectId() != null) {
+            Subject subject = subjectRepository.findById(quizDTO.getSubjectId())
+                    .orElseThrow(() -> new EntityNotFoundException("Subject not found with id: " + quizDTO.getSubjectId()));
+            quiz.setSubject(subject);
+        } else {
+            throw new IllegalArgumentException("Subject ID must not be null");
+        }
+
         modelMapper.map(quizDTO, quiz);
         Quiz updatedQuiz = quizRepository.save(quiz);
-
         return modelMapper.map(updatedQuiz, QuizDTO.class);
     }
+
 
     @Override
     public QuizDTO findQuizById(long quizId) {

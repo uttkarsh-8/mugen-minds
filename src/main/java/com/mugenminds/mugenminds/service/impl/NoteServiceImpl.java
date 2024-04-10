@@ -82,6 +82,9 @@ public class NoteServiceImpl implements NoteService {
     @Override
     @Transactional
     public String deleteNote(long noteId) {
+        if (!noteRepository.existsById(noteId)) {
+            throw new EntityNotFoundException("Past year paper not found with id: " + noteId);
+        }
         noteRepository.deleteById(noteId);
 
         return "Note deleted successfully!!";
